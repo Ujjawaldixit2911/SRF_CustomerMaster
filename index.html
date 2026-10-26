@@ -1,0 +1,3399 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Master — Bulk &amp; Single Update</title>
+    <style>
+      :root {
+        --navy: #1e3a8a;
+        --blue: #1e6bd6;
+        --blue-dark: #1557b0;
+        --blue-soft: #eff6ff;
+        --bg: #eef2f6;
+        --card: #ffffff;
+        --line: #e5e7eb;
+        --line2: #eef1f5;
+        --text: #1f2933;
+        --muted: #6b7280;
+        --muted2: #9aa4b2;
+        --green: #059669;
+        --green-soft: #ecfdf5;
+        --amber: #f59e0b;
+        --amber-soft: #fffbeb;
+        --red: #dc2626;
+        --red-soft: #fef2f2;
+        --violet: #7c3aed;
+        --radius: 10px;
+        --shadow:
+          0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+        --shadow-lg: 0 10px 30px rgba(16, 24, 40, 0.18);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family:
+          "Segoe UI",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #c7d0da;
+        border-radius: 8px;
+        border: 2px solid var(--bg);
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #aab6c4;
+      }
+
+      /* ---------- Header ---------- */
+      .header {
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 22px;
+        position: sticky;
+        top: 0;
+        z-index: 40;
+      }
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .header-logo {
+        height: 38px;
+      }
+      .header-titles h1 {
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--navy);
+        letter-spacing: 0.2px;
+      }
+      .header-titles p {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 1px;
+      }
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .tabs {
+        display: flex;
+        gap: 4px;
+        background: #f1f4f8;
+        padding: 4px;
+        border-radius: 9px;
+      }
+      .tab {
+        border: none;
+        background: transparent;
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 12.5px;
+        padding: 7px 15px;
+        border-radius: 7px;
+        cursor: pointer;
+        transition: 0.15s;
+      }
+      .tab.active {
+        background: #fff;
+        color: var(--navy);
+        box-shadow: var(--shadow);
+      }
+      .tab:hover:not(.active) {
+        color: var(--text);
+      }
+      .user-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--navy), var(--blue));
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 12px;
+      }
+
+      .wrap {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 18px 22px 120px;
+      }
+      .view {
+        display: none;
+      }
+      .view.active {
+        display: block;
+      }
+
+      /* ---------- KPI strip ---------- */
+      /* KPI Card Hover Zoom Effect */
+
+.kpi {
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.kpi:hover {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  z-index: 10;
+}
+      .kpis {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+        
+      }
+      .kpi {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 12px 14px;
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+     
+        
+      }
+      .kpi .icon {  
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        
+        
+        
+      }
+      .kpi-icon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
+/* Different KPI icon colors */
+
+.kpi:nth-child(1) .kpi-icon {
+  color: #2563eb; /* Blue - Total Customers */
+}
+
+.kpi:nth-child(2) .kpi-icon {
+  color: #16a34a; /* Green - Active */
+}
+
+.kpi:nth-child(3) .kpi-icon {
+  color: #dc2626; /* Red - Inactive */
+}
+
+.kpi:nth-child(4) .kpi-icon {
+  color: #7c3aed; /* Purple - Countries */
+}
+
+.kpi:nth-child(5) .kpi-icon {
+  color: #9333ea; /* Violet - Regions */
+}
+
+.kpi:nth-child(6) .kpi-icon {
+  color: #0891b2; /* Cyan - New */
+}
+
+.kpi:nth-child(7) .kpi-icon {
+  color: #ea580c; /* Orange - Modified */
+}
+
+.kpi:nth-child(8) .kpi-icon {
+  color: #dc2626; /* Red - Data Issues */
+}
+
+
+      .kpi::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--blue);
+      }
+      .kpi.green::before {
+        background: var(--green);
+      }
+      .kpi.amber::before {
+        background: var(--amber);
+      }
+      .kpi.red::before {
+        background: var(--red);
+      }
+      .kpi.violet::before {
+        background: var(--violet);
+      }
+      .kpi .val {
+        font-size: 21px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: 0.3px;
+      }
+      .kpi .lbl {
+        font-size: 10.5px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-top: 2px;
+        font-weight: 600;
+      }
+
+      /* ---------- Filter panel ---------- */
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+      .filter-panel {
+        padding: 16px 18px;
+        margin-bottom: 14px;
+      }
+      .filter-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .filter-head .t {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--navy);
+      }
+      .filter-head .t svg {
+        width: 16px;
+        height: 16px;
+        stroke: var(--blue);
+      }
+      .match-toggle {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .seg {
+        display: inline-flex;
+        background: #f1f4f8;
+        border-radius: 7px;
+        padding: 3px;
+      }
+      .seg button {
+        border: none;
+        background: transparent;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: var(--muted);
+        padding: 4px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .seg button.on {
+        background: var(--navy);
+        color: #fff;
+      }
+      .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 12px;
+      }
+      .fld {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .fld label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .fld input,
+      .fld select {
+        border: 1.5px solid var(--line);
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 12.5px;
+        color: var(--text);
+        background: #fff;
+        font-family: inherit;
+        transition: 0.15s;
+        width: 100%;
+      }
+      .fld input:focus,
+      .fld select:focus {
+        outline: none;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(30, 107, 214, 0.12);
+      }
+      .more-fields {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 12px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px dashed var(--line);
+        display: none;
+      }
+      .more-fields.show {
+        display: grid;
+      }
+      .filter-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .btn {
+        border: none;
+        border-radius: 8px;
+        font-family: inherit;
+        font-weight: 600;
+        font-size: 12.5px;
+        padding: 9px 16px;
+        cursor: pointer;
+        transition: 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .btn svg {
+        width: 15px;
+        height: 15px;
+      }
+      .btn-primary {
+        background: var(--blue);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--blue-dark);
+      }
+      .btn-ghost {
+        background: #fff;
+        border: 1.5px solid var(--line);
+        color: var(--text);
+      }
+      .btn-ghost:hover {
+        background: #f7f9fc;
+        border-color: #cbd5e1;
+      }
+      .btn-link {
+        background: transparent;
+        color: var(--blue);
+        padding: 8px 6px;
+      }
+      .btn-link:hover {
+        text-decoration: underline;
+      }
+      .btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .spacer {
+        flex: 1;
+      }
+
+      /* ---------- Results toolbar ---------- */
+      .res-tool {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 11px 16px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-top-left-radius: var(--radius);
+        border-top-right-radius: var(--radius);
+        border-bottom: none;
+        flex-wrap: wrap;
+      }
+      .res-tool .count {
+        font-weight: 700;
+        color: var(--navy);
+        font-size: 13px;
+      }
+      .res-tool .count span {
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .mini {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .mini select {
+        border: 1.5px solid var(--line);
+        border-radius: 7px;
+        padding: 5px 8px;
+        font-size: 11.5px;
+        font-family: inherit;
+        background: #fff;
+        color: var(--text);
+      }
+      .chk {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        user-select: none;
+        font-size: 12px;
+        color: var(--text);
+      }
+      .chk input {
+        width: 15px;
+        height: 15px;
+        accent-color: var(--blue);
+        cursor: pointer;
+      }
+      .dq-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11.5px;
+        color: var(--amber);
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      /* ---------- Buckets & cards ---------- */
+      .results {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-bottom-left-radius: var(--radius);
+        border-bottom-right-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+      .bucket {
+        border-top: 1px solid var(--line);
+      }
+      .bucket:first-child {
+        border-top: none;
+      }
+      .bucket-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px;
+        background: linear-gradient(90deg, #f8fbff, #f3f7fd);
+        cursor: pointer;
+      }
+      .bucket-head:hover {
+        background: #eef4fd;
+      }
+      .bucket-head .chev {
+        transition: 0.2s;
+        color: var(--muted);
+      }
+      .bucket-head.collapsed .chev {
+        transform: rotate(-90deg);
+      }
+      .bucket-tag {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--blue);
+        background: var(--blue-soft);
+        padding: 2px 8px;
+        border-radius: 20px;
+      }
+      .bucket-name {
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--text);
+      }
+      .bucket-count {
+        font-size: 11.5px;
+        color: var(--muted);
+        font-weight: 600;
+        background: #eef1f5;
+        padding: 2px 9px;
+        border-radius: 20px;
+      }
+      .bucket-body {
+      }
+      .bucket-body.hide {
+        display: none;
+      }
+
+      .cust {
+        border-top: 1px solid var(--line2);
+        transition: 0.12s;
+      }
+      .cust:hover {
+        background: #fcfdff;
+      }
+      .cust.sel {
+        background: var(--blue-soft);
+      }
+      .cust.sel:hover {
+        background: #e3edfd;
+      }
+      .cust-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 16px 11px 18px;
+      }
+      .cust-row .box {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--blue);
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .cust-main {
+        flex: 1;
+        min-width: 0;
+      }
+      .cust-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        flex-wrap: wrap;
+      }
+      .cust-title .nm {
+        font-weight: 700;
+        font-size: 13.5px;
+        color: var(--text);
+      }
+      .cust-title .no {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 600;
+        font-family: "Consolas", monospace;
+      }
+      .badge {
+        font-size: 9.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        padding: 2px 7px;
+        border-radius: 5px;
+        white-space: nowrap;
+      }
+      .b-ou {
+        background: #eef2ff;
+        color: #4338ca;
+      }
+      .b-reg {
+        background: #ecfeff;
+        color: #0e7490;
+      }
+      .b-ctry {
+        background: #f0fdf4;
+        color: #15803d;
+      }
+      .b-active {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+      .b-inactive {
+        background: #f3f4f6;
+        color: #6b7280;
+      }
+      .b-export {
+        background: #fff7ed;
+        color: #c2410c;
+      }
+      .b-domestic {
+        background: #eff6ff;
+        color: #1d4ed8;
+      }
+      .cust-sub {
+        display: flex;
+        gap: 18px;
+        margin-top: 5px;
+        flex-wrap: wrap;
+      }
+      .kv {
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .kv b {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .flags {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .flag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--amber);
+        background: var(--amber-soft);
+        border: 1px solid #fde68a;
+        padding: 2px 7px;
+        border-radius: 20px;
+      }
+      .flag.err {
+        color: var(--red);
+        background: var(--red-soft);
+        border-color: #fecaca;
+      }
+      .cust-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-shrink: 0;
+      }
+      .expand-btn {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 7px;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--muted);
+        transition: 0.15s;
+      }
+      .expand-btn:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+      }
+      .expand-btn svg {
+        transition: 0.2s;
+      }
+      .expand-btn.open svg {
+        transform: rotate(180deg);
+      }
+
+      .detail {
+        display: none;
+        padding: 2px 16px 16px 46px;
+        background: #fafcff;
+        border-top: 1px dashed var(--line);
+      }
+      .detail.show {
+        display: block;
+      }
+      .acct {
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        margin-top: 12px;
+        overflow: hidden;
+        background: #fff;
+      }
+      .acct-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 13px;
+        background: #f6f9fe;
+      }
+      .acct-head .ic {
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        background: var(--navy);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .acct-head .an {
+        font-weight: 700;
+        font-size: 12.5px;
+      }
+      .acct-head .anum {
+        font-size: 11px;
+        color: var(--muted);
+        font-family: monospace;
+      }
+      .acct-meta {
+        margin-left: auto;
+        display: flex;
+        gap: 16px;
+      }
+      .sites-wrap {
+        padding: 4px 13px 12px;
+      }
+      .sites-title {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: var(--muted);
+        font-weight: 700;
+        margin: 9px 2px 6px;
+      }
+      table.sites {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11.5px;
+      }
+      table.sites th {
+        text-align: left;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: var(--muted2);
+        font-weight: 700;
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--line);
+      }
+      table.sites td {
+        padding: 7px 8px;
+        border-bottom: 1px solid var(--line2);
+        color: var(--text);
+      }
+      table.sites tr:last-child td {
+        border-bottom: none;
+      }
+      .pill {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 12px;
+      }
+      .pill.on {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+      .pill.off {
+        background: #f3f4f6;
+        color: #6b7280;
+      }
+      .warn-cell {
+        color: var(--red);
+        font-weight: 600;
+      }
+      .empty {
+        padding: 44px;
+        text-align: center;
+        color: var(--muted);
+      }
+      .empty svg {
+        width: 42px;
+        height: 42px;
+        stroke: #cbd5e1;
+        margin-bottom: 10px;
+      }
+
+      /* ---------- Sticky action bar ---------- */
+      .actionbar {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 20px;
+        background: var(--navy);
+        color: #fff;
+        border-radius: 14px;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 11px 16px;
+        z-index: 45;
+        transition: 0.25s;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .actionbar.show {
+        opacity: 1;
+        pointer-events: auto;
+        bottom: 24px;
+      }
+      .actionbar .selinfo {
+        font-size: 12.5px;
+        font-weight: 600;
+      }
+      .actionbar .selinfo b {
+        font-size: 15px;
+      }
+      .actionbar .divider {
+        width: 1px;
+        height: 26px;
+        background: rgba(255, 255, 255, 0.25);
+      }
+      .ab-btn {
+        border: none;
+        border-radius: 9px;
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 12.5px;
+        padding: 9px 16px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.15s;
+      }
+      .ab-modify {
+        background: #fff;
+        color: var(--navy);
+      }
+      .ab-modify:hover {
+        background: #eef4ff;
+      }
+      .ab-replace {
+        background: var(--blue);
+        color: #fff;
+      }
+      .ab-replace:hover {
+        background: var(--blue-dark);
+      }
+      .ab-clear {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      .ab-clear:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
+      .ab-btn svg {
+        width: 15px;
+        height: 15px;
+      }
+
+      /* ---------- Modal ---------- */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(2px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 60;
+        padding: 20px;
+      }
+      .overlay.show {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: var(--shadow-lg);
+        width: 100%;
+        max-width: 640px;
+        max-height: 88vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: pop 0.2s ease;
+      }
+      .modal.wide {
+        max-width: 720px;
+      }
+      @keyframes pop {
+        from {
+          transform: translateY(12px) scale(0.98);
+          opacity: 0;
+        }
+        to {
+          transform: none;
+          opacity: 1;
+        }
+      }
+      .modal-head {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .modal-head h3 {
+        font-size: 15px;
+        color: var(--navy);
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .modal-head h3 svg {
+        width: 18px;
+        height: 18px;
+        stroke: var(--blue);
+      }
+      .modal-head .x {
+        border: none;
+        background: #f1f4f8;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        cursor: pointer;
+        color: var(--muted);
+        font-size: 16px;
+      }
+      .modal-head .x:hover {
+        background: #e6ebf2;
+      }
+      .modal-body {
+        padding: 18px 20px;
+        overflow-y: auto;
+      }
+      .modal-foot {
+        padding: 14px 20px;
+        border-top: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fafbfc;
+      }
+      .step-lbl {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+      .field-opt {
+        border: 1.5px solid var(--line);
+        border-radius: 10px;
+        padding: 12px;
+        cursor: pointer;
+        transition: 0.15s;
+        text-align: center;
+      }
+      .field-opt:hover {
+        border-color: var(--blue);
+        background: var(--blue-soft);
+      }
+      .field-opt.on {
+        border-color: var(--blue);
+        background: var(--blue-soft);
+        box-shadow: 0 0 0 3px rgba(30, 107, 214, 0.12);
+      }
+      .field-opt .fi {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: #eef4ff;
+        color: var(--blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 8px;
+      }
+      .field-opt .fi svg {
+        width: 18px;
+        height: 18px;
+      }
+      .field-opt .fn {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      .field-opt .fd {
+        font-size: 10px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      .info-box {
+        background: var(--blue-soft);
+        border: 1px solid #cfe0f9;
+        border-radius: 9px;
+        padding: 11px 13px;
+        font-size: 12px;
+        color: #1e40af;
+        display: flex;
+        gap: 9px;
+        align-items: flex-start;
+        margin-bottom: 14px;
+      }
+      .info-box svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .frm-row {
+        margin-bottom: 14px;
+      }
+      .frm-row label {
+        display: block;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+      .frm-row input,
+      .frm-row select {
+        width: 100%;
+        border: 1.5px solid var(--line);
+        border-radius: 8px;
+        padding: 9px 11px;
+        font-size: 13px;
+        font-family: inherit;
+      }
+      .frm-row input:focus,
+      .frm-row select:focus {
+        outline: none;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(30, 107, 214, 0.12);
+      }
+      .fr-two {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 12px;
+        align-items: end;
+      }
+      .fr-two .arrow {
+        padding-bottom: 10px;
+        color: var(--blue);
+      }
+      .preview-tbl {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        margin-top: 6px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .preview-tbl th {
+        background: #f6f8fb;
+        text-align: left;
+        padding: 8px 10px;
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+      .preview-tbl td {
+        padding: 8px 10px;
+        border-top: 1px solid var(--line2);
+      }
+      .preview-tbl .old {
+        color: var(--muted);
+        text-decoration: line-through;
+      }
+      .preview-tbl .new {
+        color: var(--green);
+        font-weight: 700;
+      }
+      .approve-note {
+        margin-top: 14px;
+        font-size: 11.5px;
+        color: var(--muted);
+        background: #fafbfc;
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        padding: 10px 12px;
+      }
+      .approve-note b {
+        color: var(--navy);
+      }
+      .flow {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 7px;
+      }
+      .flow .n {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 3px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .flow .a {
+        color: var(--muted2);
+      }
+
+      /* ---------- Toast ---------- */
+      .toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--green);
+        border-radius: 10px;
+        box-shadow: var(--shadow-lg);
+        padding: 14px 18px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        z-index: 80;
+        max-width: 380px;
+        transform: translateY(20px);
+        opacity: 0;
+        transition: 0.25s;
+        pointer-events: none;
+      }
+      .toast.show {
+        transform: none;
+        opacity: 1;
+      }
+      .toast .tic {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background: var(--green-soft);
+        color: var(--green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .toast .tt {
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .toast .ts {
+        font-size: 11.5px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+
+      /* ---------- Request Tracker ---------- */
+      .rt-sec {
+        margin-bottom: 20px;
+      }
+      .rt-sec h2 {
+        font-size: 14px;
+        color: var(--navy);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .rt-sec h2 .cnt {
+        font-size: 11px;
+        background: var(--blue-soft);
+        color: var(--blue);
+        padding: 2px 9px;
+        border-radius: 20px;
+        font-weight: 700;
+      }
+      .tbl-wrap {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow-x: auto;
+      }
+      table.rt {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        min-width: 900px;
+      }
+      table.rt th {
+        background: #f6f8fb;
+        text-align: left;
+        padding: 10px 12px;
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: var(--muted);
+        font-weight: 700;
+        white-space: nowrap;
+        border-bottom: 1px solid var(--line);
+      }
+      table.rt td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--line2);
+        white-space: nowrap;
+      }
+      table.rt tr:hover td {
+        background: #fafcff;
+      }
+      .rid {
+        font-weight: 700;
+        color: var(--blue);
+        font-family: monospace;
+      }
+      .st {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .st.pend {
+        background: var(--amber-soft);
+        color: #b45309;
+      }
+      .st.appr {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+      .st.oracle {
+        background: #eef2ff;
+        color: #4338ca;
+      }
+      .st.saved {
+        background: #f3f4f6;
+        color: #6b7280;
+      }
+      .st.fin {
+        background: #faf5ff;
+        color: #7c3aed;
+      }
+      .dq-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+      .dq-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow);
+      }
+      .dq-card .h {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-weight: 700;
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+      .dq-card .h .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+      }
+      .dq-card .big {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--text);
+      }
+      .dq-card .sub {
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .footer {
+        text-align: center;
+        font-size: 11px;
+        color: var(--muted2);
+        padding: 16px;
+      }
+      @media (max-width: 1200px) {
+        .kpis {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .filter-grid,
+        .more-fields.show {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .field-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .dq-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-left">
+        <img
+          class="header-logo"
+          src="data:image/png;base64,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"
+          alt="SRF"
+        />
+        <div class="header-titles">
+          <h1>Customer Master</h1>
+          <!-- <p>Bulk &amp; Single Update Console · BPM ⇄ Oracle R12</p> -->
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="tabs">
+          <button class="tab active" data-view="dash">Dashboard</button>
+          <button class="tab" data-view="tracker">Request Tracker</button>
+          <button class="tab" data-view="dq">Data Quality</button>
+        </div>
+        <div class="user-chip">
+          <span>SKUMAR · PFB India OU</span>
+          <div class="avatar">SK</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <!-- ============ DASHBOARD ============ -->
+      <div class="view active" id="view-dash">
+        <!-- KPIs -->
+        <div class="kpis">
+          <div class="kpi">
+            <div class="icon">
+            <div class="val">2,418</div>
+            
+
+              <svg class="kpi-icon"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+  
+           
+            </div>
+          <div class="lbl">Total Customers</div>
+
+          </div>
+          <div class="kpi green">
+
+            <div class="icon">
+  <div class="val">2,190</div>
+                 <div>
+  <svg class="kpi-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+    <polyline points="22 4 12 14.01 9 11.01"/>
+  </svg>
+</div>
+            </div>
+          
+
+            <div class="lbl">Active</div>
+       
+          </div>
+          <div class="kpi">
+            <div class="icon">
+   <div class="val">228</div>
+                      <div>
+  <svg class="kpi-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="15" y1="9" x2="9" y2="15"/>
+    <line x1="9" y1="9" x2="15" y2="15"/>
+  </svg>
+</div>
+
+            </div>
+         
+            <div class="lbl">Inactive</div>
+  
+
+          </div>
+          <div class="kpi violet">
+          <div class="icon">
+            <div class="val">63</div><div>
+  <svg class="kpi-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="2" y1="12" x2="22" y2="12"/>
+    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+  </svg>
+</div>
+</div>
+            <div class="lbl">Countries</div>
+            
+          </div>
+          <div class="kpi violet">
+            <div class="icon">
+            <div class="val">11</div> <div>
+  <svg class="kpi-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+    <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+    <polyline points="2 17 12 22 22 17"/>
+    <polyline points="2 12 12 17 22 12"/>
+  </svg>
+</div>
+          </div>
+            <div class="lbl">Regions</div>
+           
+          </div>
+          <div class="kpi green"><div class="icon">
+            <div class="val">47</div>   <div>
+  <svg class="kpi-icon"  viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+    <circle cx="8.5" cy="7" r="4"/>
+    <line x1="20" y1="8" x2="20" y2="14"/>
+    <line x1="23" y1="11" x2="17" y2="11"/>
+  </svg>
+</div></div>
+            <div class="lbl">New (30d)</div>
+         
+          </div>
+          <div class="kpi">
+            <div class="icon">
+            <div class="val">132</div><div>
+  <svg class="kpi-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+    <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+  </svg>
+</div>
+            </div>
+            <div class="lbl">Modified (30d)</div>
+         
+          </div>
+          <div class="kpi red"><div class="icon">
+            <div class="val">96</div> <div>
+  <svg class="kpi-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+    <line x1="12" y1="9" x2="12" y2="13"/>
+    <line x1="12" y1="17" x2="12.01" y2="17"/>
+  </svg>
+</div>
+</div>
+            <div class="lbl">Data Issues</div>
+           
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="panel filter-panel">
+          <div class="filter-head">
+            <div class="t">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
+              </svg>
+              Search &amp; Filter Customers
+            </div>
+            <div class="match-toggle">
+              Match conditions:
+              <div class="seg" id="matchSeg">
+                <button class="on" data-m="AND">AND</button>
+                <button data-m="OR">OR</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-grid">
+            <div class="fld">
+              <label>Customer Name</label
+              ><input id="f_name" placeholder="e.g. Candypink" />
+            </div>
+            <div class="fld">
+              <label>Sales Person</label>
+              <select id="f_sp">
+                <option value="">All</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label>Country</label>
+              <select id="f_country">
+                <option value="">All</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label>Region</label>
+              <select id="f_region">
+                <option value="">All</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label>Account No.</label
+              ><input id="f_acct" placeholder="e.g. 3210…" />
+            </div>
+            <div class="fld">
+              <label>Operating Unit</label>
+              <select id="f_ou">
+                <option value="">All</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="more-fields" id="moreFields">
+            <div class="fld">
+              <label>Payment Term</label>
+              <select id="f_pt">
+                <option value="">All</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label>Profile Class</label>
+              <select id="f_pc">
+                <option value="">All</option>
+                <option>EXPORT</option>
+                <option>DOMESTIC</option>
+                <option>SCRAP</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label>Status</label>
+              <select id="f_status">
+                <option value="">All</option>
+                <option>Active</option>
+                <option>Inactive</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label>City</label><input id="f_city" placeholder="City" />
+            </div>
+            <div class="fld">
+              <label>PAN Number</label><input id="f_pan" placeholder="PAN" />
+            </div>
+            <div class="fld">
+              <label>Created After</label><input id="f_date" type="date" />
+            </div>
+          </div>
+
+          <div class="filter-actions">
+            <button class="btn btn-primary" onclick="applyFilters()">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              Search
+            </button>
+            <button class="btn btn-ghost" onclick="resetFilters()">
+              Reset
+            </button>
+            <button class="btn btn-link" id="moreBtn" onclick="toggleMore()">
+              + Add more filters
+            </button>
+            <div class="spacer"></div>
+            <!-- <span class="mini" style="color: var(--muted)"
+              >Tip: pick a Sales Person, then <b>Modify</b> or
+              <b>Find &amp; Replace</b> in bulk</span -->
+            >
+          </div>
+        </div>
+
+        <!-- Results toolbar -->
+        <div class="res-tool">
+          <label class="chk"
+            ><input
+              type="checkbox"
+              id="selAll"
+              onchange="toggleSelectAll(this)"
+            />
+            Select all</label
+          >
+          <div class="count" id="resCount">0 <span>customers</span></div>
+          <div class="spacer"></div>
+          <label class="dq-toggle"
+            ><input
+              type="checkbox"
+              id="dqOnly"
+              style="accent-color: var(--amber)"
+              onchange="applyFilters()"
+            />
+            Only data-quality issues</label
+          >
+          <div class="mini">
+            Group by:
+            <select id="groupBy" onchange="renderResults()">
+              <option value="salesperson">Sales Person</option>
+              <option value="country">Country</option>
+              <option value="region">Region</option>
+              <option value="operatingUnit">Operating Unit</option>
+              <option value="paymentTerm">Payment Term</option>
+              <option value="none">None (flat list)</option>
+            </select>
+          </div>
+        </div>
+        <div class="results" id="results"></div>
+      </div>
+
+      <!-- ============ REQUEST TRACKER ============ -->
+      <div class="view" id="view-tracker">
+        <div class="rt-sec">
+          <h2>Actionable Requests <span class="cnt">10</span></h2>
+          <div class="tbl-wrap">
+            <table class="rt">
+              <thead>
+                <tr>
+                  <th>Request ID</th>
+                  <th>Customer Name</th>
+                  <th>PAN</th>
+                  <th>Status</th>
+                  <th>Request Type</th>
+                  <th>Created On</th>
+                  <th>Created By</th>
+                  <th>Operating Unit</th>
+                  <th>Business Unit</th>
+                </tr>
+              </thead>
+              <tbody id="rtActionable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="rt-sec">
+          <h2>Non-Actionable Requests <span class="cnt">10</span></h2>
+          <div class="tbl-wrap">
+            <table class="rt">
+              <thead>
+                <tr>
+                  <th>Request ID</th>
+                  <th>Customer Name</th>
+                  <th>PAN</th>
+                  <th>Status</th>
+                  <th>Request Type</th>
+                  <th>Created By</th>
+                  <th>Created On</th>
+                  <th>Assignee</th>
+                  <th>Level</th>
+                  <th>Operating Unit</th>
+                </tr>
+              </thead>
+              <tbody id="rtNonAct"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="rt-sec">
+          <h2>Drafts <span class="cnt">5</span></h2>
+          <div class="tbl-wrap">
+            <table class="rt">
+              <thead>
+                <tr>
+                  <th>Request ID</th>
+                  <th>Customer Name</th>
+                  <th>Status</th>
+                  <th>Created By</th>
+                  <th>Operating Unit</th>
+                  <th>Business Unit</th>
+                  <th>Created On</th>
+                  <th>Request Type</th>
+                </tr>
+              </thead>
+              <tbody id="rtDrafts"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ DATA QUALITY ============ -->
+      <div class="view" id="view-dq">
+        <div class="dq-grid">
+          <div class="dq-card">
+            <div class="h">
+              <span class="dot" style="background: var(--red)"></span>Email
+              mismatch across sites
+            </div>
+            <div class="big">34</div>
+            <div class="sub">
+              Sites with differing email IDs under one customer
+            </div>
+          </div>
+          <div class="dq-card">
+            <div class="h">
+              <span class="dot" style="background: var(--amber)"></span>Missing
+              Region
+            </div>
+            <div class="big">21</div>
+            <div class="sub">
+              Customer sites without a valid Oracle region LOV
+            </div>
+          </div>
+          <div class="dq-card">
+            <div class="h">
+              <span class="dot" style="background: var(--amber)"></span>Missing
+              / Inactive Sales Person
+            </div>
+            <div class="big">18</div>
+            <div class="sub">Blocks order creation in Oracle</div>
+          </div>
+          <div class="dq-card">
+            <div class="h">
+              <span class="dot" style="background: var(--amber)"></span>Missing
+              Payment Term
+            </div>
+            <div class="big">15</div>
+            <div class="sub">Bill-to / Ship-to term unresolved</div>
+          </div>
+          <div class="dq-card">
+            <div class="h">
+              <span class="dot" style="background: var(--red)"></span>Invalid
+              Country-State-City-Region
+            </div>
+            <div class="big">8</div>
+            <div class="sub">Combination fails ERP validation on push</div>
+          </div>
+          <div class="dq-card">
+            <div class="h">
+              <span class="dot" style="background: var(--violet)"></span
+              >Non-standard Sales Person names
+            </div>
+            <div class="big">12</div>
+            <div class="sub">e.g. “Vikas”, “V. Pansari”, “Vikas Pansari”</div>
+          </div>
+        </div>
+        <div class="info-box" style="max-width: none">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 16v-4M12 8h.01" />
+          </svg>
+          Customers flagged here also appear in the Dashboard with a ⚠ marker.
+          Use “Only data-quality issues” on the Dashboard to work through them,
+          then bulk-fix with Modify or Find &amp; Replace.
+        </div>
+      </div>
+    </div>
+    <!-- /wrap -->
+
+    <!-- Sticky action bar -->
+    <div class="actionbar" id="actionbar">
+      <div class="selinfo"><b id="abCount">0</b> selected</div>
+      <div class="divider"></div>
+      <button class="ab-btn ab-modify" onclick="openModify()">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+          />
+          <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+        </svg>
+        Modify / Update
+      </button>
+      <button class="ab-btn ab-replace" onclick="openReplace()">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M3 7v6h6" />
+          <path d="M21 17v-6h-6" />
+          <path d="M3 13a9 9 0 0 1 15-6.7L21 9" />
+          <path d="M21 11a9 9 0 0 1-15 6.7L3 15" />
+        </svg>
+        Find &amp; Replace
+      </button>
+      <button class="ab-btn ab-clear" onclick="clearSel()">Clear</button>
+    </div>
+
+    <!-- Modify modal -->
+    <div class="overlay" id="modifyOverlay">
+      <div class="modal">
+        <div class="modal-head">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path
+                d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+              />
+              <path
+                d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+              /></svg
+            >What do you want to update?
+          </h3>
+          <button class="x" onclick="closeModal('modifyOverlay')">✕</button>
+        </div>
+        <div class="modal-body" id="modifyBody"></div>
+        <div class="modal-foot">
+          <span
+            class="mini"
+            id="modifySelNote"
+            style="color: var(--muted)"
+          ></span>
+          <div class="spacer"></div>
+          <button
+            class="btn btn-ghost"
+            id="modifyBack"
+            style="display: none"
+            onclick="modifyStep(1)"
+          >
+            Back
+          </button>
+          <button
+            class="btn btn-primary"
+            id="modifyNext"
+            disabled
+            onclick="modifyNext()"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Find & Replace modal -->
+    <div class="overlay" id="replaceOverlay">
+      <div class="modal wide">
+        <div class="modal-head">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M3 7v6h6" />
+              <path d="M21 17v-6h-6" />
+              <path d="M3 13a9 9 0 0 1 15-6.7L21 9" />
+              <path d="M21 11a9 9 0 0 1-15 6.7L3 15" /></svg
+            >Find &amp; Replace
+          </h3>
+          <button class="x" onclick="closeModal('replaceOverlay')">✕</button>
+        </div>
+        <div class="modal-body" id="replaceBody"></div>
+        <div class="modal-foot">
+          <span
+            class="mini"
+            id="replaceSelNote"
+            style="color: var(--muted)"
+          ></span>
+          <div class="spacer"></div>
+          <button class="btn btn-ghost" onclick="closeModal('replaceOverlay')">
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="submitReplace()">
+            Apply &amp; Submit for Approval
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">
+      <div class="tic">
+        <svg
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+        >
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+      </div>
+      <div>
+        <div class="tt" id="toastTitle"></div>
+        <div class="ts" id="toastSub"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      © 2024 SRF Limited · Customer Master Data Management · Internal Use Only
+    </div>
+
+    <script>
+      /* =================== HARDCODED MOCK DATA =================== */
+      const FIELD_META = {
+        salesperson: {
+          name: "Sales Person",
+          desc: "Reassign owner",
+          lov: [
+            "Simran Kaur",
+            "Siddharth Rao",
+            "Harshit Jain",
+            "Vikas Pansari",
+            "Harsh Mehta",
+          ],
+          flow: ["Initiator", "HOD (Marketing)", "Oracle Push"],
+        },
+        email: {
+          name: "Email ID",
+          desc: "Multi-site email",
+          type: "email",
+          flow: ["Initiator", "F&A", "Oracle Push"],
+        },
+        paymentTerm: {
+          name: "Payment Term",
+          desc: "Bill-to / Ship-to",
+          lov: [
+            "Advance",
+            "LC at Sight",
+            "30 Days Credit",
+            "60 Days Credit",
+            "90 Days Credit",
+            "No Credit",
+          ],
+          flow: ["Initiator", "F&A Head", "Oracle Push"],
+        },
+        creditLimit: {
+          name: "Credit Limit",
+          desc: "Account / site level",
+          type: "number",
+          flow: [
+            "Initiator",
+            "F&A Head",
+            "BCFO (if > threshold)",
+            "Oracle Push",
+          ],
+        },
+        region: {
+          name: "Region",
+          desc: "Zone mapping",
+          lov: [
+            "SOUTH EAST ASIA",
+            "EUROPE",
+            "MIDDLE EAST",
+            "DOMESTIC INDIA",
+            "SOUTH & LATIN AMERICA",
+            "AFRICA",
+            "NORTH AMERICA",
+            "SAARC",
+          ],
+          flow: ["Initiator", "Zonal / Regional Head", "Oracle Push"],
+        },
+        profileClass: {
+          name: "Profile Class",
+          desc: "Domestic / Export",
+          lov: ["EXPORT", "DOMESTIC", "SCRAP"],
+          flow: ["Initiator", "F&A", "Oracle Push"],
+        },
+        classification: {
+          name: "Classification",
+          desc: "Customer category",
+          lov: ["Internal", "External", "Related Party", "Trader", "OEM"],
+          flow: ["Initiator", "HOD", "Oracle Push"],
+        },
+        address: {
+          name: "Address",
+          desc: "Postal / City",
+          type: "text",
+          flow: ["Initiator", "F&A", "Oracle Push"],
+        },
+        accountTag: {
+          name: "Account Tag",
+          desc: "Custom tag",
+          type: "text",
+          flow: ["Initiator", "HOD", "Oracle Push"],
+        },
+      };
+
+      const CUSTOMERS = [
+        {
+          id: "12706439",
+          name: "CANDYPINK INVESTMENTS CC",
+          custNo: "C-88401",
+          pan: "",
+          salesperson: "Simran Kaur",
+          email: "accounts@candypink.co.za",
+          country: "South Africa",
+          region: "AFRICA",
+          state: "KwaZulu-Natal",
+          city: "Durban",
+          paymentTerm: "30 Days Credit",
+          creditLimit: "ZAR 1,200,000",
+          profileClass: "EXPORT",
+          classification: "External",
+          operatingUnit: "ALTECH IN OU",
+          status: "Active",
+          flags: [],
+          accounts: [
+            {
+              accNo: "321045",
+              accName: "Candypink Investments CC",
+              status: "Active",
+              ou: "ALTECH IN OU",
+              currency: "ZAR",
+              creditLimit: "1,200,000",
+              sites: [
+                {
+                  siteNo: "S-90112",
+                  bu: "PFB Durban",
+                  country: "South Africa",
+                  siteName: "Durban Main",
+                  ou: "ALTECH IN OU",
+                  status: "Active",
+                  useCode: "BILL_TO",
+                  salesperson: "Simran Kaur",
+                  email: "accounts@candypink.co.za",
+                  paymentTerm: "30 Days Credit",
+                  city: "Durban",
+                  postal: "4001",
+                },
+                {
+                  siteNo: "S-90113",
+                  bu: "PFB Durban",
+                  country: "South Africa",
+                  siteName: "Durban Ship",
+                  ou: "ALTECH IN OU",
+                  status: "Active",
+                  useCode: "SHIP_TO",
+                  salesperson: "Simran Kaur",
+                  email: "accounts@candypink.co.za",
+                  paymentTerm: "30 Days Credit",
+                  city: "Durban",
+                  postal: "4001",
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          id: "11902551",
+          name: "KOROZO AMBALAJ SAN. VE TIC. A.S",
+          custNo: "C-71220",
+          pan: "",
+          salesperson: "Simran Kaur",
+          email: "purchasing@korozo.com.tr",
+          country: "Turkey",
+          region: "EUROPE",
+          state: "Istanbul",
+          city: "Istanbul",
+          paymentTerm: "LC at Sight",
+          creditLimit: "USD 850,000",
+          profileClass: "EXPORT",
+          classification: "External",
+          operatingUnit: "PFB HU OU",
+          status: "Active",
+          flags: ["Email mismatch across sites"],
+          accounts: [
+            {
+              accNo: "440210",
+              accName: "Korozo Ambalaj",
+              status: "Active",
+              ou: "PFB HU OU",
+              currency: "USD",
+              creditLimit: "850,000",
+              sites: [
+                {
+                  siteNo: "S-77010",
+                  bu: "PFB Hungary",
+                  country: "Turkey",
+                  siteName: "Istanbul HQ",
+                  ou: "PFB HU OU",
+                  status: "Active",
+                  useCode: "BILL_TO",
+                  salesperson: "Simran Kaur",
+                  email: "purchasing@korozo.com.tr",
+                  paymentTerm: "LC at Sight",
+                  city: "Istanbul",
+                  postal: "34000",
+                },
+                {
+                  siteNo: "S-77011",
+                  bu: "PFB Hungary",
+                  country: "Turkey",
+                  siteName: "Gebze Plant",
+                  ou: "PFB HU OU",
+                  status: "Active",
+                  useCode: "SHIP_TO",
+                  salesperson: "Simran Kaur",
+                  email: "orders@korozo.com.tr",
+                  paymentTerm: "LC at Sight",
+                  city: "Gebze",
+                  postal: "41400",
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          id: "12455901",
+          name: "DNP VIETNAM CO., LTD.",
+          custNo: "C-66203",
+          pan: "",
+          salesperson: "Simran Kaur",
+          email: "",
+          country: "Vietnam",
+          region: "",
+          state: "Ha Nam",
+          city: "Phu Ly",
+          paymentTerm: "",
+          creditLimit: "USD 300,000",
+          profileClass: "EXPORT",
+          classification: "External",
+          operatingUnit: "PFB THAI OU",
+          status: "Active",
+          flags: ["Missing Region", "Missing Payment Term", "Missing Email"],
+          accounts: [
+            {
+              accNo: "512330",
+              accName: "DNP Vietnam Co Ltd",
+              status: "Active",
+              ou: "PFB THAI OU",
+              currency: "USD",
+              creditLimit: "300,000",
+              sites: [
+                {
+                  siteNo: "S-61220",
+                  bu: "PFB Rayong",
+                  country: "Vietnam",
+                  siteName: "Phu Ly Factory",
+                  ou: "PFB THAI OU",
+                  status: "Active",
+                  useCode: "BILL_TO",
+                  salesperson: "Simran Kaur",
+                  email: "",
+                  paymentTerm: "",
+                  city: "Phu Ly",
+                  postal: "—",
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          id: "12701001",
+          name: "SRF INDUSTEX BELTING PTY LIMITED",
+          custNo: "C-70455",
+          pan: "",
+          salesperson: "Harshit Jain",
+          email: "ap@srfindustex.co.za",
+          country: "South Africa",
+          region: "AFRICA",
+          state: "Gauteng",
+          city: "Johannesburg",
+          paymentTerm: "60 Days Credit",
+          creditLimit: "ZAR 4,500,000",
+          profileClass: "EXPORT",
+          classification: "Related Party",
+          operatingUnit: "PFB INDIA OU",
+          status: "Active",
+          flags: ["Email mismatch across sites"],
+          accounts: [
+            {
+              accNo: "330120",
+              accName: "SRF Industex – Trade",
+              status: "Active",
+              ou: "PFB INDIA OU",
+              currency: "ZAR",
+              creditLimit: "4,500,000",
+              sites: [
+                {
+                  siteNo: "S-44120",
+                  bu: "PFB Indore (DTA)",
+                  country: "South Africa",
+                  siteName: "JHB Bill",
+                  ou: "PFB INDIA OU",
+                  status: "Active",
+                  useCode: "BILL_TO",
+                  salesperson: "Harshit Jain",
+                  email: "ap@srfindustex.co.za",
+                  paymentTerm: "60 Days Credit",
+                  city: "Johannesburg",
+                  postal: "2001",
+                },
+                {
+                  siteNo: "S-44121",
+                  bu: "PFB Indore (DTA)",
+                  country: "South Africa",
+                  siteName: "JHB Ship",
+                  ou: "PFB INDIA OU",
+                  status: "Active",
+                  useCode: "SHIP_TO",
+                  salesperson: "Harshit Jain",
+                  email: "logistics@srfindustex.co.za",
+                  paymentTerm: "60 Days Credit",
+                  city: "Johannesburg",
+                  postal: "2001",
+                },
+              ],
+            },
+            {
+              accNo: "330121",
+              accName: "SRF Industex – Project",
+              status: "Active",
+              ou: "PFB INDIA OU",
+              currency: "ZAR",
+              creditLimit: "1,000,000",
+              sites: [
+                {
+                  siteNo: "S-44130",
+                  bu: "PFB Indore (DTA)",
+                  country: "South Africa",
+                  siteName: "Cape Town",
+                  ou: "PFB INDIA OU",
+                  status: "Active",
+                  useCode: "BILL_TO",
+                  salesperson: "Harshit Jain",
+                  email: "ap@srfindustex.co.za",
+                  paymentTerm: "60 Days Credit",
+                  city: "Cape Town",
+                  postal: "8001",
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          id: "12690112",
+          name: "PLASTIC CONNECTIONS, INC.",
+          custNo: "C-69880",
+          pan: "",
+          salesperson: "Harshit Jain",
+          email: "ap@plasticconnections.com",
+          country: "United States",
+          region: "NORTH AMERICA",
+          state: "Illinois",
+          city: "Chicago",
+          paymentTerm: "Advance",
+          creditLimit: "USD 0",
+          profileClass: "EXPORT",
+          classification: "External",
+          operatingUnit: "PFB HU OU",
+          status: "Active",
+          flags: [],
+          accounts: [
+            {
+              accNo: "358820",
+              accName: "Plastic Connections Inc",
+              status: "Active",
+              ou: "PFB HU OU",
+              currency: "USD",
+              creditLimit: "0",
+              sites: [
+                {
+                  siteNo: "S-55210",
+                  bu: "PFB Hungary",
+                  country: "United States",
+                  siteName: "Chicago HQ",
+                  ou: "PFB HU OU",
+                  status: "Active",
+                  useCode: "BILL_TO",
+                  salesperson: "Harshit Jain",
+                  email: "ap@plasticconnections.com",
+                  paymentTerm: "Advance",
+                  city: "Chicago",
+                  postal: "60601",
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          id: "12488220",
+          name: "MYI DELTA TRADING CO LLC",
+          custNo: "C-64110",
+          pan: "",
+          salesperson: "Vikas Pansari",
+          email: "finance@myidelta.ae",
+          country: "United Arab Emirates",
+          region: "MIDDLE EAST",
+          state: "Dubai",
+          city: "Dubai",
+          paymentTerm: "90 Days Credit",
+          creditLimit: "USD 2,000,000",
+          profileClass: "EXPORT",
+          classification: "Trader",
+          operatingUnit: "PFB INDIA OU",
+          status: "Active",
+          flags: [],
+          accounts: [
+            {
+              accNo: "301180",
+              accName: "MYI Delta Trading",
+              status: "Active",
+              ou: "PFB INDIA OU",
+              currency: "USD",
+              creditLimit: "2,000,000",
+              sites: [
+                {
+                  siteNo: "S-40110",
+                  bu: "PFB Indore (DTA)",
+                  country: "United Arab Emirates",
+                  siteName: "JAFZA",
+                  ou: "PFB INDIA OU",
+                  status: "Active",
+                  useCode: "BILL_TO",
+                  salesperson: "Vikas Pansari",
+                  email: "finance@myidelta.ae",
+                  paymentTerm: "90 Days Credit",
+                  city: "Dubai",
+                  postal: "17000",
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          id: "12511777",
+          name: "SCIENTEX PACKAGING (AYER KEROH) BERHAD",
+          custNo: "C-65540",
+          pan: "",
+          salesperson: "Vikas Pansari",
+          email: "po@scientex.com.my",
+          country: "Malaysia",
+          region: "SOUTH EAST ASIA",
+          state: "Melaka",
+          city: "Ayer Keroh",
+          paymentTerm: "60 Days Credit",
+          creditLimit: "USD 1,750,000",
+          profileClass: "EXPORT",
+          classification: "External",
+          operatingUnit: "PFB THAI OU",
+          status: "Active",
+          flags: [],
+          accounts: [
+            {
+              accNo: "520410",
+              accName: "Scientex Packaging",
+              status: "Active",
+              ou: "PFB THAI OU",
+              currency: "USD",
+              creditLimit: "1,750,000",
+              sites: [
+                {
+                  siteNo: "S-62210",
+                  bu: "PFB Rayong",
+                  country: "Malaysia",
+                  siteName: "Ayer Keroh",
+                  ou: "PFB THAI OU",
+                  status: "Active",
+                  useCode: "BILL_TO",
+                  salesperson: "Vikas Pansari",
+                  email: "po@scientex.com.my",
+                  paymentTerm: "60 Days Credit",
+                  city: "Ayer Keroh",
+                  postal: "75450",
+                },
+                {
+                  siteNo: "S-62211",
+                  bu: "PFB Rayong",
+                  country: "Malaysia",
+                  siteName: "Pulau Indah",
+                  ou: "PFB THAI OU",
+                  status: "Active",
+                  useCode: "SHIP_TO",
+                  salesperson: "Vikas Pansari",
+                  email: "po@scientex.com.my",
+                  paymentTerm: "60 Days Credit",
+                  city: "Pulau Indah",
+                  postal: "42920",
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          id: "12633401",
+          name: "CROWN CHEMICAL CO.,LTD",
+          custNo: "C-68120",
+          pan: "",
+          salesperson: "Harsh Mehta",
+          email: "trade@crownchem.co.kr",
+          country: "South Korea",
+          region: "SOUTH EAST ASIA",
+          state: "Seoul",
+          city: "Seoul",
+          paymentTerm: "LC at Sight",
+          creditLimit: "USD 900,000",
+          profileClass: "EXPORT",
+          classification: "External",
+          operatingUnit: "PFB THAI OU",
+          status: "Active",
+          flags: ["Non-standard sales person name"],
+          accounts: [
+            {
+              accNo: "524110",
+              accName: "Crown Chemical Co",
+              status: "Active",
+              ou: "PFB THAI OU",
+              currency: "USD",
+              creditLimit: "900,000",
+              sites: [
+                {
+                  siteNo: "S-63310",
+                  bu: "PFB Rayong",
+                  country: "South Korea",
+                  siteName: "Seoul Office",
+                  ou: "PFB THAI OU",
+                  status: "Active",
+                  useCode: "BILL_TO",
+                  salesperson: "Harsh Mehta",
+                  email: "trade@crownchem.co.kr",
+                  paymentTerm: "LC at Sight",
+                  city: "Seoul",
+                  postal: "04520",
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          id: "12655120",
+          name: "ROYAL STICK ENTERPRISES PRIVATE LIMITED",
+          custNo: "C-68990",
+          pan: "AAFCR2993D",
+          salesperson: "Harsh Mehta",
+          email: "accounts@royalstick.in",
+          country: "India",
+          region: "DOMESTIC INDIA",
+          state: "Madhya Pradesh",
+          city: "Indore",
+          paymentTerm: "30 Days Credit",
+          creditLimit: "INR 5,000,000",
+          profileClass: "DOMESTIC",
+          classification: "External",
+          operatingUnit: "PFB INDIA OU",
+          status: "Active",
+          flags: [],
+          accounts: [
+            {
+              accNo: "300455",
+              accName: "Royal Stick Enterprises",
+              status: "Active",
+              ou: "PFB INDIA OU",
+              currency: "INR",
+              creditLimit: "5,000,000",
+              sites: [
+                {
+                  siteNo: "S-41010",
+                  bu: "PFB Indore (DTA)",
+                  country: "India",
+                  siteName: "Indore Plant",
+                  ou: "PFB INDIA OU",
+                  status: "Active",
+                  useCode: "BILL_TO",
+                  salesperson: "Harsh Mehta",
+                  email: "accounts@royalstick.in",
+                  paymentTerm: "30 Days Credit",
+                  city: "Indore",
+                  postal: "452001",
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          id: "12677230",
+          name: "BIOPLAST SRL",
+          custNo: "C-69410",
+          pan: "",
+          salesperson: "Siddharth Rao",
+          email: "amministrazione@bioplast.it",
+          country: "Italy",
+          region: "EUROPE",
+          state: "Lombardy",
+          city: "Milan",
+          paymentTerm: "60 Days Credit",
+          creditLimit: "EUR 600,000",
+          profileClass: "EXPORT",
+          classification: "External",
+          operatingUnit: "PFB SA OU",
+          status: "Inactive",
+          flags: ["Inactive account"],
+          accounts: [
+            {
+              accNo: "610220",
+              accName: "Bioplast SRL",
+              status: "Inactive",
+              ou: "PFB SA OU",
+              currency: "EUR",
+              creditLimit: "600,000",
+              sites: [
+                {
+                  siteNo: "S-70210",
+                  bu: "PFB Durban",
+                  country: "Italy",
+                  siteName: "Milan HQ",
+                  ou: "PFB SA OU",
+                  status: "Inactive",
+                  useCode: "BILL_TO",
+                  salesperson: "Siddharth Rao",
+                  email: "amministrazione@bioplast.it",
+                  paymentTerm: "60 Days Credit",
+                  city: "Milan",
+                  postal: "20100",
+                },
+              ],
+            },
+          ],
+        },
+      ];
+
+      /* Request Tracker data (from pasted portal screens) */
+      const RT_ACTIONABLE = [
+        [
+          "CM-6678",
+          "DAFS SCHOOL",
+          "",
+          "PENDING AT INITIATOR",
+          "New Customer",
+          "01-APR-2025",
+          "SKUMAR",
+          "PFB INDIA OU",
+          "PFB Indore (DTA)",
+        ],
+        [
+          "CM-6294",
+          "SRF INDUSTEX BELTING PTY LIMITED",
+          "",
+          "PENDING AT INITIATOR",
+          "Modify Multiple Site Email",
+          "06-FEB-2025",
+          "SKUMAR",
+          "PFB INDIA OU",
+          "",
+        ],
+        [
+          "CM-6284",
+          "MYI DELTA TRADING CO LLC",
+          "",
+          "PENDING AT INITIATOR",
+          "Modify Multiple Site Email",
+          "06-FEB-2025",
+          "SKUMAR",
+          "PFB INDIA OU",
+          "",
+        ],
+        [
+          "CM-6078",
+          "HINTAMI",
+          "",
+          "PENDING AT INITIATOR",
+          "Modify Site Email",
+          "06-JAN-2025",
+          "SKUMAR",
+          "PFB INDIA OU",
+          "PFB Indore (DTA)",
+        ],
+        [
+          "CM-5424",
+          "CARE CUSTOMER THAI",
+          "",
+          "PENDING AT INITIATOR",
+          "New Site",
+          "21-JUN-2024",
+          "SKUMAR",
+          "PFB THAI OU",
+          "PFB Rayong",
+        ],
+        [
+          "CM-5397",
+          "FOREIGNONE",
+          "",
+          "PENDING AT INITIATOR",
+          "New Customer",
+          "21-JUN-2024",
+          "SKUMAR",
+          "PFB THAI OU",
+          "PFB Rayong",
+        ],
+        [
+          "CM-5378",
+          "YESBURGMAN",
+          "",
+          "PENDING AT INITIATOR",
+          "New Customer",
+          "21-JUN-2024",
+          "SKUMAR",
+          "PFB THAI OU",
+          "PFB Rayong",
+        ],
+        [
+          "CM-5261",
+          "THAI EVEN CUSTO",
+          "",
+          "PENDING AT INITIATOR",
+          "New Customer",
+          "17-JUN-2024",
+          "SKUMAR",
+          "PFB THAI OU",
+          "PFB Rayong",
+        ],
+        [
+          "CM-5257",
+          "THAI ONLY DAY CUSTOMER",
+          "",
+          "PENDING AT INITIATOR",
+          "New Account",
+          "17-JUN-2024",
+          "SKUMAR",
+          "PFB THAI OU",
+          "PFB Rayong",
+        ],
+        [
+          "CM-4601",
+          "KANGAROO CUSTOMER",
+          "",
+          "PENDING AT INITIATOR",
+          "New Account",
+          "08-APR-2024",
+          "SKUMAR",
+          "PFB HU OU",
+          "PFB Hungary",
+        ],
+      ];
+      const RT_NONACT = [
+        [
+          "CM-7198",
+          "IRFAN TEST HU",
+          "",
+          "PENDING WITH ORACLE-1",
+          "New Customer",
+          "SKUMAR",
+          "03-JUL-2026",
+          "EDIT.TARCSAY",
+          "Level 3 of 3",
+          "PFB HU OU",
+          "PFB Hungary",
+        ],
+        [
+          "CM-7192",
+          "SAMETOHU",
+          "",
+          "PENDING FOR APPROVAL",
+          "New Customer",
+          "SKUMAR",
+          "02-JUL-2026",
+          "ARIHANT.AGARWAL",
+          "Level 1 of 3",
+          "PFB HU OU",
+          "PFB Hungary",
+        ],
+        [
+          "CM-7189",
+          "ASKFGJ",
+          "",
+          "PENDING FOR APPROVAL",
+          "New Customer",
+          "SKUMAR",
+          "01-JUL-2026",
+          "ARIHANT.AGARWAL",
+          "Level 1 of 3",
+          "PFB INDIA OU",
+          "",
+        ],
+        [
+          "CM-7184",
+          "PLASTIC CONNECTIONS, INC.",
+          "",
+          "PENDING FOR APPROVAL",
+          "Create/Modify Account Relationship",
+          "SKUMAR",
+          "30-JUN-2026",
+          "ARIHANT.AGARWAL",
+          "Level 1 of 3",
+          "PFB HU OU",
+          "",
+        ],
+        [
+          "CM-7183",
+          "PLASTIC CONNECTIONS, INC.",
+          "",
+          "PENDING FOR APPROVAL",
+          "Create/Modify Account Relationship",
+          "SKUMAR",
+          "30-JUN-2026",
+          "ARIHANT.AGARWAL",
+          "Level 1 of 3",
+          "PFB HU OU",
+          "",
+        ],
+        [
+          "CM-7181",
+          "VEGA MUSIC-1",
+          "",
+          "PENDING FOR APPROVAL",
+          "New Customer",
+          "SKUMAR",
+          "30-JUN-2026",
+          "VIKAS",
+          "Level 1 of 3",
+          "PFB SA OU",
+          "PFB Durban",
+        ],
+        [
+          "CM-7179",
+          "ROYAL STICK ENTERPRISES PRIVATE LIMITED",
+          "AAFCR2993D",
+          "PENDING FOR APPROVAL",
+          "New Account",
+          "SKUMAR",
+          "26-JUN-2026",
+          "ARIHANT.AGARWAL",
+          "Level 1 of 3",
+          "PFB INDIA OU",
+          "PFB Indore (DTA)",
+        ],
+        [
+          "CM-7178",
+          "JFHDS",
+          "AQWSQ1221R",
+          "PENDING FOR APPROVAL",
+          "New Customer",
+          "SKUMAR",
+          "26-JUN-2026",
+          "ARIHANT.AGARWAL",
+          "Level 1 of 3",
+          "PFB INDIA OU",
+          "PFB Indore (DTA)",
+        ],
+        [
+          "CM-7177",
+          "BIOPLAST SRL",
+          "",
+          "PENDING WITH ORACLE-1",
+          "New Site",
+          "SKUMAR",
+          "25-JUN-2026",
+          "BARUN.MAITY",
+          "Level 4 of 4",
+          "PFB SA OU",
+          "PFB Durban",
+        ],
+        [
+          "CM-7176",
+          "SRF INDUSTEX BELTING PTY LIMITED",
+          "",
+          "PENDING AT FINANCE POOL",
+          "Modify Multiple Site Email",
+          "SKUMAR",
+          "11-JUN-2026",
+          "FINANCE",
+          "Level 2 of 2",
+          "PFB INDIA OU",
+          "",
+        ],
+      ];
+      const RT_DRAFTS = [
+        [
+          "CM-7201",
+          "ASD - SRF",
+          "SAVED",
+          "SKUMAR",
+          "PFB THAI OU",
+          "PFB Rayong",
+          "07-JUL-26",
+          "New Customer",
+        ],
+        [
+          "CM-7191",
+          "SRF INDUSTEX BELTING PTY LIMITED",
+          "SAVED",
+          "SKUMAR",
+          "PFB INDIA OU",
+          "",
+          "02-JUL-26",
+          "New Account",
+        ],
+        [
+          "CM-7190",
+          "ZASFAF",
+          "SAVED",
+          "SKUMAR",
+          "PFB INDIA OU",
+          "",
+          "01-JUL-26",
+          "New Customer",
+        ],
+        [
+          "CM-7188",
+          "CANDYPINK INVESTMENTS CC",
+          "SAVED",
+          "SKUMAR",
+          "ALTECH IN OU",
+          "",
+          "01-JUL-26",
+          "New Account",
+        ],
+        [
+          "CM-7187",
+          "ASDHB",
+          "SAVED",
+          "SKUMAR",
+          "ALTECH IN OU",
+          "",
+          "01-JUL-26",
+          "New Customer",
+        ],
+      ];
+
+      /* =================== STATE =================== */
+      let matchMode = "AND";
+      let filtered = [...CUSTOMERS];
+      const selected = new Set();
+      let nextReqId = 7202;
+
+      /* populate filter dropdowns */
+      function uniq(arr) {
+        return [...new Set(arr.filter(Boolean))].sort();
+      }
+      function fillSelect(id, vals) {
+        const s = document.getElementById(id);
+        vals.forEach((v) => {
+          const o = document.createElement("option");
+          o.textContent = v;
+          s.appendChild(o);
+        });
+      }
+      fillSelect("f_sp", uniq(CUSTOMERS.map((c) => c.salesperson)));
+      fillSelect("f_country", uniq(CUSTOMERS.map((c) => c.country)));
+      fillSelect("f_region", uniq(CUSTOMERS.map((c) => c.region)));
+      fillSelect("f_ou", uniq(CUSTOMERS.map((c) => c.operatingUnit)));
+      fillSelect("f_pt", uniq(CUSTOMERS.map((c) => c.paymentTerm)));
+
+      /* =================== TABS =================== */
+      document.querySelectorAll(".tab").forEach(
+        (t) =>
+          (t.onclick = () => {
+            document
+              .querySelectorAll(".tab")
+              .forEach((x) => x.classList.remove("active"));
+            document
+              .querySelectorAll(".view")
+              .forEach((x) => x.classList.remove("active"));
+            t.classList.add("active");
+            document
+              .getElementById("view-" + t.dataset.view)
+              .classList.add("active");
+          }),
+      );
+
+      /* match toggle */
+      document.querySelectorAll("#matchSeg button").forEach(
+        (b) =>
+          (b.onclick = () => {
+            document
+              .querySelectorAll("#matchSeg button")
+              .forEach((x) => x.classList.remove("on"));
+            b.classList.add("on");
+            matchMode = b.dataset.m;
+            applyFilters();
+          }),
+      );
+      function toggleMore() {
+        const m = document.getElementById("moreFields");
+        m.classList.toggle("show");
+        document.getElementById("moreBtn").textContent = m.classList.contains(
+          "show",
+        )
+          ? "– Fewer filters"
+          : "+ Add more filters";
+      }
+
+      /* =================== FILTERING =================== */
+      function applyFilters() {
+        const v = (id) =>
+          document.getElementById(id).value.trim().toLowerCase();
+        const conds = [];
+        const name = v("f_name");
+        if (name) conds.push((c) => c.name.toLowerCase().includes(name));
+        const sp = v("f_sp");
+        if (sp) conds.push((c) => c.salesperson.toLowerCase() === sp);
+        const ctry = v("f_country");
+        if (ctry) conds.push((c) => c.country.toLowerCase() === ctry);
+        const reg = v("f_region");
+        if (reg) conds.push((c) => c.region.toLowerCase() === reg);
+        const acct = v("f_acct");
+        if (acct)
+          conds.push((c) =>
+            c.accounts.some((a) => a.accNo.toLowerCase().includes(acct)),
+          );
+        const ou = v("f_ou");
+        if (ou) conds.push((c) => c.operatingUnit.toLowerCase() === ou);
+        const pt = v("f_pt");
+        if (pt) conds.push((c) => c.paymentTerm.toLowerCase() === pt);
+        const pc = v("f_pc");
+        if (pc) conds.push((c) => c.profileClass.toLowerCase() === pc);
+        const stt = v("f_status");
+        if (stt) conds.push((c) => c.status.toLowerCase() === stt);
+        const city = v("f_city");
+        if (city) conds.push((c) => c.city.toLowerCase().includes(city));
+        const pan = v("f_pan");
+        if (pan) conds.push((c) => (c.pan || "").toLowerCase().includes(pan));
+        const dqOnly = document.getElementById("dqOnly").checked;
+
+        filtered = CUSTOMERS.filter((c) => {
+          let ok =
+            conds.length === 0
+              ? true
+              : matchMode === "AND"
+                ? conds.every((f) => f(c))
+                : conds.some((f) => f(c));
+          if (ok && dqOnly) ok = c.flags.length > 0;
+          return ok;
+        });
+        renderResults();
+      }
+      function resetFilters() {
+        [
+          "f_name",
+          "f_sp",
+          "f_country",
+          "f_region",
+          "f_acct",
+          "f_ou",
+          "f_pt",
+          "f_pc",
+          "f_status",
+          "f_city",
+          "f_pan",
+          "f_date",
+        ].forEach((id) => (document.getElementById(id).value = ""));
+        document.getElementById("dqOnly").checked = false;
+        filtered = [...CUSTOMERS];
+        renderResults();
+      }
+
+      /* =================== RENDER RESULTS =================== */
+      function badge(cls, txt) {
+        return `<span class="badge ${cls}">${txt}</span>`;
+      }
+      function esc(s) {
+        return (s || "").replace(
+          /[&<>"]/g,
+          (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[m],
+        );
+      }
+
+      function custCard(c) {
+        const sel = selected.has(c.id);
+        const nSites = c.accounts.reduce((n, a) => n + a.sites.length, 0);
+        const flags = c.flags
+          .map((f) => {
+            const err = /mismatch|Inactive|Invalid/i.test(f);
+            return `<span class="flag ${err ? "err" : ""}">⚠ ${esc(f)}</span>`;
+          })
+          .join("");
+        const accts = c.accounts
+          .map(
+            (a) => `
+    <div class="acct">
+      <div class="acct-head">
+        <div class="ic">A</div>
+        <div><div class="an">${esc(a.accName)}</div></div>
+        <span class="anum">#${a.accNo}</span>
+        <div class="acct-meta">
+          <span class="kv">Status <b>${a.status}</b></span>
+          <span class="kv">Currency <b>${a.currency}</b></span>
+          <span class="kv">Credit Limit <b>${a.currency} ${a.creditLimit}</b></span>
+        </div>
+      </div>
+      <div class="sites-wrap">
+        <div class="sites-title">Sites · ${a.sites.length}</div>
+        <table class="sites">
+          <thead><tr><th>Site No.</th><th>Site Name</th><th>Use</th><th>Country / City</th><th>Sales Person</th><th>Email</th><th>Payment Term</th><th>Status</th></tr></thead>
+          <tbody>${a.sites
+            .map(
+              (s) => `<tr>
+            <td style="font-family:monospace">${s.siteNo}</td>
+            <td>${esc(s.siteName)}</td>
+            <td>${s.useCode}</td>
+            <td>${esc(s.country)} / ${esc(s.city)}</td>
+            <td>${esc(s.salesperson) || '<span class="warn-cell">—</span>'}</td>
+            <td>${esc(s.email) || '<span class="warn-cell">missing</span>'}</td>
+            <td>${esc(s.paymentTerm) || '<span class="warn-cell">missing</span>'}</td>
+            <td><span class="pill ${s.status === "Active" ? "on" : "off"}">${s.status}</span></td>
+          </tr>`,
+            )
+            .join("")}</tbody>
+        </table>
+      </div>
+    </div>`,
+          )
+          .join("");
+
+        return `<div class="cust ${sel ? "sel" : ""}" data-id="${c.id}">
+    <div class="cust-row">
+      <input type="checkbox" class="box" ${sel ? "checked" : ""} onchange="toggleSel('${c.id}',this)">
+      <div class="cust-main">
+        <div class="cust-title">
+          <span class="nm">${esc(c.name)}</span>
+          <span class="no">${c.custNo}</span>
+          ${badge("b-ou", c.operatingUnit)}
+          ${c.region ? badge("b-reg", c.region) : ""}
+          ${badge("b-ctry", c.country)}
+          ${badge(c.status === "Active" ? "b-active" : "b-inactive", c.status)}
+          ${badge(c.profileClass === "EXPORT" ? "b-export" : "b-domestic", c.profileClass)}
+        </div>
+        <div class="cust-sub">
+          <span class="kv">Sales Person <b>${esc(c.salesperson) || "—"}</b></span>
+          <span class="kv">Email <b>${esc(c.email) || "<span class=warn-cell>missing</span>"}</b></span>
+          <span class="kv">Payment Term <b>${esc(c.paymentTerm) || "<span class=warn-cell>missing</span>"}</b></span>
+          <span class="kv">Credit Limit <b>${esc(c.creditLimit)}</b></span>
+          <span class="kv">Sites <b>${nSites}</b></span>
+          ${c.pan ? `<span class="kv">PAN <b>${c.pan}</b></span>` : ""}
+        </div>
+        ${flags ? `<div class="flags" style="margin-top:7px">${flags}</div>` : ""}
+      </div>
+      <div class="cust-right">
+        <button class="expand-btn" onclick="toggleDetail('${c.id}',this)" title="Expand">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="detail" id="det-${c.id}">${accts}</div>
+  </div>`;
+      }
+
+      function renderResults() {
+        const grp = document.getElementById("groupBy").value;
+        const host = document.getElementById("results");
+        document.getElementById("resCount").innerHTML =
+          `${filtered.length} <span>customer${filtered.length !== 1 ? "s" : ""}${filtered.length !== CUSTOMERS.length ? " matched" : ""}</span>`;
+
+        if (filtered.length === 0) {
+          host.innerHTML = `<div class="empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <div>No customers match your filters.</div></div>`;
+          syncActionbar();
+          return;
+        }
+        if (grp === "none") {
+          host.innerHTML = filtered.map(custCard).join("");
+          postRender();
+          return;
+        }
+        const tagMap = {
+          salesperson: "Sales Person",
+          country: "Country",
+          region: "Region",
+          operatingUnit: "Operating Unit",
+          paymentTerm: "Payment Term",
+        };
+        const buckets = {};
+        filtered.forEach((c) => {
+          const k = c[grp] || "(blank)";
+          (buckets[k] = buckets[k] || []).push(c);
+        });
+        host.innerHTML = Object.keys(buckets)
+          .sort()
+          .map((k, i) => {
+            const items = buckets[k];
+            return `<div class="bucket">
+      <div class="bucket-head" onclick="toggleBucket(this)">
+        <svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        <span class="bucket-tag">${tagMap[grp]}</span>
+        <span class="bucket-name">${esc(k)}</span>
+        <span class="bucket-count">${items.length} customer${items.length !== 1 ? "s" : ""}</span>
+      </div>
+      <div class="bucket-body">${items.map(custCard).join("")}</div>
+    </div>`;
+          })
+          .join("");
+        postRender();
+      }
+      function postRender() {
+        syncSelectAll();
+        syncActionbar();
+      }
+      function toggleBucket(h) {
+        h.classList.toggle("collapsed");
+        h.nextElementSibling.classList.toggle("hide");
+      }
+      function toggleDetail(id, btn) {
+        const d = document.getElementById("det-" + id);
+        d.classList.toggle("show");
+        btn.classList.toggle("open");
+      }
+
+      /* =================== SELECTION =================== */
+      function toggleSel(id, cb) {
+        cb.checked ? selected.add(id) : selected.delete(id);
+        document
+          .querySelector(`.cust[data-id="${id}"]`)
+          .classList.toggle("sel", cb.checked);
+        syncSelectAll();
+        syncActionbar();
+      }
+      function toggleSelectAll(cb) {
+        if (cb.checked) filtered.forEach((c) => selected.add(c.id));
+        else filtered.forEach((c) => selected.delete(c.id));
+        renderResults();
+      }
+      function syncSelectAll() {
+        const all =
+          filtered.length > 0 && filtered.every((c) => selected.has(c.id));
+        const sa = document.getElementById("selAll");
+        sa.checked = all;
+        sa.indeterminate = !all && filtered.some((c) => selected.has(c.id));
+      }
+      function clearSel() {
+        selected.clear();
+        renderResults();
+      }
+      function syncActionbar() {
+        const n = selected.size;
+        document.getElementById("abCount").textContent = n;
+        document.getElementById("actionbar").classList.toggle("show", n > 0);
+      }
+      function selectedCustomers() {
+        return CUSTOMERS.filter((c) => selected.has(c.id));
+      }
+
+      /* =================== MODIFY FLOW =================== */
+      let modifyField = null;
+      function openModify() {
+        if (selected.size === 0) return;
+        modifyField = null;
+        document.getElementById("modifySelNote").textContent =
+          `${selected.size} customer(s) · ${totalSites()} site(s) selected`;
+        modifyStep(1);
+        document.getElementById("modifyOverlay").classList.add("show");
+      }
+      function totalSites() {
+        return selectedCustomers().reduce(
+          (n, c) => n + c.accounts.reduce((m, a) => m + a.sites.length, 0),
+          0,
+        );
+      }
+      function fieldIcon() {
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';
+      }
+      function modifyStep(step) {
+        const body = document.getElementById("modifyBody");
+        document.getElementById("modifyBack").style.display =
+          step === 2 ? "inline-flex" : "none";
+        const nextBtn = document.getElementById("modifyNext");
+        if (step === 1) {
+          nextBtn.textContent = "Next";
+          nextBtn.disabled = !modifyField;
+          body.innerHTML = `<div class="step-lbl">Step 1 · Choose one field to update</div>
+      <div class="info-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Each request updates <b>one field</b> across all selected customers/sites — this keeps validation &amp; auditing clean.</div>
+      <div class="field-grid">
+        ${Object.entries(FIELD_META)
+          .map(
+            ([k, m]) => `
+          <div class="field-opt ${modifyField === k ? "on" : ""}" onclick="pickField('${k}')">
+            <div class="fi">${fieldIcon()}</div>
+            <div class="fn">${m.name}</div><div class="fd">${m.desc}</div>
+          </div>`,
+          )
+          .join("")}
+      </div>`;
+        } else {
+          const m = FIELD_META[modifyField];
+          nextBtn.textContent = "Submit for Approval";
+          nextBtn.disabled = false;
+          const input = m.lov
+            ? `<select id="newVal"><option value="">Select ${m.name}…</option>${m.lov.map((o) => `<option>${o}</option>`).join("")}</select>`
+            : `<input id="newVal" type="${m.type || "text"}" placeholder="Enter new ${m.name}…">`;
+          const rows = selectedCustomers()
+            .map(
+              (c) =>
+                `<tr><td>${esc(c.name)}</td><td class="old">${esc(currentVal(c, modifyField)) || "—"}</td><td class="new" id="pv-${c.id}">—</td></tr>`,
+            )
+            .join("");
+          body.innerHTML = `<div class="step-lbl">Step 2 · Set new value for “${m.name}”</div>
+      <div class="frm-row"><label>New ${m.name}</label>${input}</div>
+      <div class="step-lbl" style="margin-top:16px">Preview · current → new</div>
+      <table class="preview-tbl"><thead><tr><th>Customer</th><th>Current</th><th>New</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="approve-note">Approval flow for <b>${m.name}</b>:
+        <div class="flow">${m.flow.map((f, i) => `<span class="n">${f}</span>${i < m.flow.length - 1 ? '<span class="a">→</span>' : ""}`).join("")}</div>
+      </div>`;
+          document
+            .getElementById("newVal")
+            .addEventListener("input", updatePreview);
+          document
+            .getElementById("newVal")
+            .addEventListener("change", updatePreview);
+        }
+      }
+      function pickField(k) {
+        modifyField = k;
+        document.getElementById("modifyNext").disabled = false;
+        document
+          .querySelectorAll("#modifyBody .field-opt")
+          .forEach((el) => el.classList.remove("on"));
+        event.currentTarget.classList.add("on");
+      }
+      function currentVal(c, f) {
+        const map = {
+          salesperson: c.salesperson,
+          email: c.email,
+          paymentTerm: c.paymentTerm,
+          creditLimit: c.creditLimit,
+          region: c.region,
+          profileClass: c.profileClass,
+          classification: c.classification,
+          address: c.city + " " + (c.state || ""),
+          accountTag: "—",
+        };
+        return map[f] !== undefined ? map[f] : "—";
+      }
+      function updatePreview() {
+        const val = document.getElementById("newVal").value;
+        selectedCustomers().forEach((c) => {
+          document.getElementById("pv-" + c.id).textContent = val || "—";
+        });
+      }
+      function modifyNext() {
+        if (!modifyField) return;
+        const back = document.getElementById("modifyBack");
+        if (back.style.display === "none") {
+          modifyStep(2);
+          return;
+        }
+        // submit
+        const val = document.getElementById("newVal").value;
+        if (!val) {
+          document.getElementById("newVal").focus();
+          return;
+        }
+        const m = FIELD_META[modifyField];
+        closeModal("modifyOverlay");
+        const rid = "CM-" + nextReqId++;
+        showToast(
+          `Request ${rid} created`,
+          `Bulk update · ${m.name} → “${val}” for ${selected.size} customer(s). Routed to ${m.flow[1]}.`,
+        );
+        clearSel();
+      }
+
+      /* =================== FIND & REPLACE =================== */
+      const REPLACE_FIELDS = {
+        salesperson: "Sales Person",
+        email: "Email ID",
+        paymentTerm: "Payment Term",
+        region: "Region",
+        profileClass: "Profile Class",
+        classification: "Classification",
+      };
+      function openReplace() {
+        if (selected.size === 0) return;
+        document.getElementById("replaceSelNote").textContent =
+          `${selected.size} customer(s) selected`;
+        const body = document.getElementById("replaceBody");
+        body.innerHTML = `
+    <div class="info-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      Pick a field, choose the value to <b>find</b>, and the value to <b>replace</b> it with. Dropdowns avoid spelling mistakes (e.g. Simran → Siddharth).</div>
+    <div class="frm-row"><label>Field</label>
+      <select id="rpField" onchange="rpFieldChange()">
+        ${Object.entries(REPLACE_FIELDS)
+          .map(([k, v]) => `<option value="${k}">${v}</option>`)
+          .join("")}
+      </select></div>
+    <div class="fr-two">
+      <div class="frm-row" style="margin:0"><label>Find</label><select id="rpFind"></select></div>
+      <div class="arrow"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <div class="frm-row" style="margin:0"><label>Replace with</label><select id="rpRepl"></select></div>
+    </div>
+    <div class="approve-note" id="rpNote" style="margin-top:16px"></div>`;
+        rpFieldChange();
+        document.getElementById("replaceOverlay").classList.add("show");
+      }
+      function rpFieldChange() {
+        const f = document.getElementById("rpField").value;
+        const present = uniq(
+          selectedCustomers()
+            .map((c) => c[f])
+            .filter(Boolean),
+        );
+        const lov =
+          FIELD_META[f] && FIELD_META[f].lov ? FIELD_META[f].lov : present;
+        const findSel = document.getElementById("rpFind"),
+          replSel = document.getElementById("rpRepl");
+        findSel.innerHTML = present.length
+          ? present.map((v) => `<option>${esc(v)}</option>`).join("")
+          : `<option value="">(no values)</option>`;
+        replSel.innerHTML = lov
+          .map((v) => `<option>${esc(v)}</option>`)
+          .join("");
+        document.getElementById("rpNote").innerHTML =
+          `Affects sites where <b>${REPLACE_FIELDS[f]}</b> matches the “find” value across the ${selected.size} selected customer(s).`;
+      }
+      function submitReplace() {
+        const f = document.getElementById("rpField").value;
+        const find = document.getElementById("rpFind").value;
+        const repl = document.getElementById("rpRepl").value;
+        if (!find) {
+          return;
+        }
+        closeModal("replaceOverlay");
+        const rid = "CM-" + nextReqId++;
+        const m = FIELD_META[f];
+        showToast(
+          `Request ${rid} created`,
+          `Find & Replace · ${REPLACE_FIELDS[f]}: “${find}” → “${repl}”. Routed to ${m.flow[1]} for approval.`,
+        );
+        clearSel();
+      }
+
+      /* =================== MODAL / TOAST HELPERS =================== */
+      function closeModal(id) {
+        document.getElementById(id).classList.remove("show");
+      }
+      document.querySelectorAll(".overlay").forEach((o) =>
+        o.addEventListener("click", (e) => {
+          if (e.target === o) closeModal(o.id);
+        }),
+      );
+      let toastTimer;
+      function showToast(title, sub) {
+        document.getElementById("toastTitle").textContent = title;
+        document.getElementById("toastSub").textContent = sub;
+        const t = document.getElementById("toast");
+        t.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove("show"), 5200);
+      }
+
+      /* =================== REQUEST TRACKER RENDER =================== */
+      function stClass(s) {
+        if (/SAVED/.test(s)) return "saved";
+        if (/ORACLE/.test(s)) return "oracle";
+        if (/FINANCE|POOL/.test(s)) return "fin";
+        if (/APPROV/.test(s)) return "pend";
+        return "pend";
+      }
+      function renderTracker() {
+        document.getElementById("rtActionable").innerHTML = RT_ACTIONABLE.map(
+          (r) => `<tr>
+    <td class="rid">${r[0]}</td><td>${esc(r[1])}</td><td>${r[2] || "—"}</td>
+    <td><span class="st ${stClass(r[3])}">${r[3]}</span></td><td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${r[7]}</td><td>${r[8] || "—"}</td></tr>`,
+        ).join("");
+        document.getElementById("rtNonAct").innerHTML = RT_NONACT.map(
+          (r) => `<tr>
+    <td class="rid">${r[0]}</td><td>${esc(r[1])}</td><td>${r[2] || "—"}</td>
+    <td><span class="st ${stClass(r[3])}">${r[3]}</span></td><td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td>${r[9]}</td></tr>`,
+        ).join("");
+        document.getElementById("rtDrafts").innerHTML = RT_DRAFTS.map(
+          (r) => `<tr>
+    <td class="rid">${r[0]}</td><td>${esc(r[1])}</td><td><span class="st saved">${r[2]}</span></td>
+    <td>${r[3]}</td><td>${r[4]}</td><td>${r[5] || "—"}</td><td>${r[6]}</td><td>${r[7]}</td></tr>`,
+        ).join("");
+      }
+
+      /* =================== INIT =================== */
+      renderResults();
+      renderTracker();
+    </script>
+  </body>
+</html>
